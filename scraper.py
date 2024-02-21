@@ -29,8 +29,10 @@ class ReadRss:
             print(e)
 
         self.articles = self.soup.find_all('item')
+        # self.articles_dicts = [{'title': a.find('title').text, 'link': a.link.next_sibling.replace('\n', '').replace(
+        #     '\t', '').replace('\r', ''), 'description': a.find('description').text, 'pubdate': a.find('pubdate').text} for a in self.articles]
         self.articles_dicts = [{'title': a.find('title').text, 'link': a.link.next_sibling.replace('\n', '').replace(
-            '\t', '').replace('\r', ''), 'description': a.find('description').text, 'pubdate': a.find('pubdate').text} for a in self.articles]
+            '\t', '').replace('\r', ''), 'description': a.find('description').text} for a in self.articles]
         self.urls = [d['link'] for d in self.articles_dicts if 'link' in d]
         self.titles = [d['title'] for d in self.articles_dicts if 'title' in d]
 
@@ -50,25 +52,25 @@ def to_json(articles, path):
 
 # commented out below while messing with guardian
         
-# articles = []
-# for article in bbc.articles_dicts[:7]:
-#     article_data = {}
-#     article_data['title'] = article['title']
-#     article_data['link'] = article['link']
-#     downloaded = fetch_url(article['link'])
-#     result = extract(downloaded, include_comments=False,
-#                      include_tables=False, include_links=False,)
-#     article_data['text'] = result
-#     response = openai.ChatCompletion.create(
-#         model="gpt-3.5-turbo",
-#         messages=[
-#             {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
-#             {"role": "user", "content": "Please provide a seven sentence summary of the following: " +
-#                 article_data['text']}
-#         ]
-#     )
-#     article_data['summary'] = response['choices'][0]['message']['content']
-#     articles.append(article_data)
+articles = []
+for article in bbc.articles_dicts[:7]:
+    article_data = {}
+    article_data['title'] = article['title']
+    article_data['link'] = article['link']
+    downloaded = fetch_url(article['link'])
+    result = extract(downloaded, include_comments=False,
+                     include_tables=False, include_links=False,)
+    article_data['text'] = result
+    # response = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=[
+    #         {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
+    #         {"role": "user", "content": "Please provide a seven sentence summary of the following: " +
+    #             article_data['text']}
+    #     ]
+    # )
+    # article_data['summary'] = response['choices'][0]['message']['content']
+    articles.append(article_data)
         
 # just messing with guardian below. No summarising
 guardian_articles = []
@@ -85,5 +87,24 @@ for article in guardian.articles_dicts[:7]:
     guardian_articles.append(article_data)
 
 # to_json(articles, 'data/bbc.json')
-to_json(guardian_articles, 'data/guardian.json') 
-print(guardian.articles_dicts[:7])
+# to_json(guardian_articles, 'data/guardian.json') 
+# print(guardian.articles_dicts[:7])
+
+bbc_title = bbc.articles_dicts[0]['title']
+guardian_titles = []
+for desc in guardian.articles_dicts:
+    guardian_titles.append(desc['title'])
+
+import spacy
+nlp = spacy.load('en_core_web_lg')
+processed_bbc = nlp(bbc_title)
+similarities = []
+for title in guardian_titles:
+    processed_guardian = nlp(title)
+    similarities.append(processed_bbc.similarity(processed_guardian))
+
+max_index = similarities.index(max(similarities))
+print(max_index)
+print(bbc.articles_dicts[0])
+print(guardian.articles_dicts[0])
+print(guardian_titles[max_index])
