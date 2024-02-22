@@ -3,11 +3,12 @@ from trafilatura import fetch_url, extract, feeds, json_metadata
 from bs4 import BeautifulSoup
 import requests
 import json
+import credentials
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0'}
 
-openai.api_key = "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"
+openai.api_key = credentials.openai_api_key
 
 
 class ReadRss:
