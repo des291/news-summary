@@ -1,14 +1,17 @@
 import openai
-from trafilatura import fetch_url, extract, feeds, json_metadata
+# from trafilatura import fetch_url, extract, feeds, json_metadata, fetch_response
+import trafilatura
 from bs4 import BeautifulSoup
 import requests
 import json
 import credentials
+import spacy
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0'}
 
 openai.api_key = credentials.openai_api_key
+nlp = spacy.load('en_core_web_lg')
 
 
 class ReadRss:
@@ -52,60 +55,79 @@ def to_json(articles, path):
 
 
 # commented out below while messing with guardian
-        
+
+guardian_descs = []
+for desc in guardian.articles_dicts:
+    guardian_descs.append(desc['description'])
+
 articles = []
+
+# fetch_url not working properly. Only working when string is passed directly in this file for some reason. Needs investigating
+
 for article in bbc.articles_dicts[:7]:
     article_data = {}
     article_data['title'] = article['title']
     article_data['link'] = article['link']
-    downloaded = fetch_url(article['link'])
-    result = extract(downloaded, include_comments=False,
-                     include_tables=False, include_links=False,)
-    article_data['text'] = result
-    # response = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=[
-    #         {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
-    #         {"role": "user", "content": "Please provide a seven sentence summary of the following: " +
-    #             article_data['text']}
-    #     ]
-    # )
-    # article_data['summary'] = response['choices'][0]['message']['content']
-    articles.append(article_data)
-        
-# just messing with guardian below. No summarising
-guardian_articles = []
-for article in guardian.articles_dicts[:7]:
-    article_data = {}
-    print(article['title'])
-    article_data['title'] = article['title']
+    print("link:")
     print(article['link'])
-    article_data['link'] = article['link']
-    downloaded = fetch_url(article['link'])
-    result = extract(downloaded, include_comments=False,
+    # downloaded = trafilatura.fetch_url(article_data['link'])
+    downloaded = trafilatura.fetch_response('https://www.bbc.co.uk/news/uk-politics-68392621')
+    result = trafilatura.extract(downloaded, include_comments=False,
                      include_tables=False, include_links=False,)
+    print("downloaded:")
+    print(downloaded)
+    print('text:')
     article_data['text'] = result
-    guardian_articles.append(article_data)
+    print(result)
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
+            {"role": "user", "content": "Please provide a seven sentence summary of the following: " + article_data['text']}
+        ]
+    )
+    article_data['summary'] = response['choices'][0]['message']['content']
+    processed_bbc = nlp(article_data['summary'])
+    similarities = []
+    for desc in guardian_descs:
+        processed_guardian = nlp(desc)
+        similarities.append(processed_bbc.similarity(processed_guardian))
+    max_index = similarities.index(max(similarities))
+    article_data['guardian_link'] = guardian.articles_dicts[max_index]['link']
 
-# to_json(articles, 'data/bbc.json')
-# to_json(guardian_articles, 'data/guardian.json') 
-# print(guardian.articles_dicts[:7])
+    articles.append(article_data)
 
-bbc_title = bbc.articles_dicts[0]['title']
-guardian_titles = []
-for desc in guardian.articles_dicts:
-    guardian_titles.append(desc['title'])
 
-import spacy
-nlp = spacy.load('en_core_web_lg')
-processed_bbc = nlp(bbc_title)
-similarities = []
-for title in guardian_titles:
-    processed_guardian = nlp(title)
-    similarities.append(processed_bbc.similarity(processed_guardian))
+# below no longer needed
+# guardian_articles = []
+# for article in guardian.articles_dicts[:7]:
+#     article_data = {}
+#     print(article['title'])
+#     article_data['title'] = article['title']
+#     print(article['link'])
+#     article_data['link'] = article['link']
+#     downloaded = fetch_url(article['link'])
+#     result = extract(downloaded, include_comments=False,
+#                      include_tables=False, include_links=False,)
+#     article_data['text'] = result
+#     guardian_articles.append(article_data)
 
-max_index = similarities.index(max(similarities))
-print(max_index)
-print(bbc.articles_dicts[0])
-print(guardian.articles_dicts[0])
-print(guardian_titles[max_index])
+to_json(articles, 'data/bbc.json')
+# # to_json(guardian_articles, 'data/guardian.json') 
+# # print(guardian.articles_dicts[:7])
+
+# bbc_desc = bbc.articles_dicts[0]['description']
+
+
+
+# processed_bbc = nlp(bbc_desc)
+# similarities = []
+# for desc in guardian_descs:
+#     processed_guardian = nlp(desc)
+#     similarities.append(processed_bbc.similarity(processed_guardian))
+
+# max_index = similarities.index(max(similarities))
+# print(max_index)
+# print(bbc.articles_dicts[0])
+# print(guardian.articles_dicts[0])
+# print(guardian_descs[max_index])

@@ -36,6 +36,7 @@ setInterval(currentTime, 1000);
 let headlines = document.getElementsByClassName("headline");
 let summaries = document.getElementsByClassName("summary");
 let links = document.getElementsByClassName("link");
+let guardian_links = document.getElementsByClassName("guardian_link");
 
 const bbc = fetch("../data/bbc.json");
 
@@ -46,6 +47,7 @@ bbc
       headlines[i].innerHTML = data[i]["title"];
       summaries[i].innerHTML = data[i]["summary"];
       links[i].setAttribute("href", data[i]["link"]);
+      guardian_links[i].setAttribute("href", data[i]["guardian_link"])
     }
   });
 
@@ -59,12 +61,15 @@ for (let i = 0; i < headlines.length; i++) {
     this.classList.toggle("active");
     let content = this.nextElementSibling;
     let link = content.nextElementSibling;
+    let guardian_link = link.nextElementSibling;
     if (content.classList.contains("hidden")) {
       content.classList.remove("hidden");
       link.classList.remove("hidden");
+      guardian_link.classList.remove("hidden");
     } else {
       content.classList.add("hidden");
       link.classList.add("hidden");
+      guardian_link.classList.add("hidden");
     }
   });
 }
