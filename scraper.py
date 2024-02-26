@@ -68,17 +68,10 @@ for article in bbc.articles_dicts[:7]:
     article_data = {}
     article_data['title'] = article['title']
     article_data['link'] = article['link']
-    print("link:")
-    print(article['link'])
-    # downloaded = trafilatura.fetch_url(article_data['link'])
-    downloaded = trafilatura.fetch_response('https://www.bbc.co.uk/news/uk-politics-68392621')
+    downloaded = trafilatura.fetch_response(article_data['link'].strip())
     result = trafilatura.extract(downloaded, include_comments=False,
                      include_tables=False, include_links=False,)
-    print("downloaded:")
-    print(downloaded)
-    print('text:')
     article_data['text'] = result
-    print(result)
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
