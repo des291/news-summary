@@ -62,8 +62,6 @@ for desc in guardian.articles_dicts:
 
 articles = []
 
-# fetch_url not working properly. Only working when string is passed directly in this file for some reason. Needs investigating
-
 for article in bbc.articles_dicts[:7]:
     article_data = {}
     article_data['title'] = article['title']
