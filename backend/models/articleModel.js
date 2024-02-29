@@ -26,4 +26,4 @@ const articleSchema = mongoose.Schema(
     timestamps: true,
 });
 
-const Article = mongoose.model('Article', articleSchema);
+export const Article = mongoose.model('Article', articleSchema);
