@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { Article } from "./models/articleModel.js";
@@ -24,7 +24,7 @@ app.post('/articles', async (request, response) => {
             !request.body.summary ||
             !request.body.guardian_link
         ) {
-            return response.status(500).send({
+            return response.status(400).send({
                 message: 'Send all required fields: title, link, text, summary, guardian_link',
             });
         }
@@ -47,6 +47,79 @@ app.post('/articles', async (request, response) => {
     }
 });
 
+// route to get all articles
+app.get('/articles', async (request, response) => {
+    try {
+        const articles = await Article.find({});
+        return response.status(200).json({
+            count: articles.length,
+            data: articles
+        });
+    } catch (error) {
+        console.log(error.message);
+        response.status(500).send({ message: error.message });
+    }
+});
+
+// route to get article by id
+app.get('/articles/:id', async (request, response) => {
+    try {
+
+        const { id } = request.params;
+
+        const article = await Article.findById(id);
+        return response.status(200).json(article);
+    } catch (error) {
+        console.log(error.message);
+        response.status(500).send({ message: error.message });
+    }
+});
+
+// route to update an article
+app.put('/articles/:id', async (request, response) => {
+    try {
+        if (
+            !request.body.title ||
+            !request.body.link ||
+            !request.body.text ||
+            !request.body.summary ||
+            !request.body.guardian_link
+        ) {
+            return response.status(400).send({
+                message: 'Send all required fields: title, link, text, summary, guardian_link',
+            });
+        }
+
+        const { id } = request.params;
+
+        const result = await Article.findByIdAndUpdate(id, request.body);
+
+        if (!result) {
+            return response.status(404).json({ message: 'Article not found' });
+        }
+        return response.status(200).send({ message: 'Article updated successfully' });
+    } catch (error) {
+        console.log(error.message);
+        response.status(500).send({ message: error.message });
+    }
+});
+
+
+// route to delete article
+app.delete('/articles/:id', async (request, response) => {
+    try {
+        const { id } = request.params;
+        const result = await Article.findByIdAndDelete(id);
+
+        if (!result) {
+            return response.status(404).json({ message: 'Article not found' });
+        }
+        return response.status(200).send({ message: 'Book deleted successfully' });
+    } catch (error) {
+        console.log(error.message);
+        response.status(500).send({ message: error.message })
+    }
+})
 mongoose
     .connect(mongoDBURL)
     .then(() => {
