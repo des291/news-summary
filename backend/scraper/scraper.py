@@ -1,5 +1,5 @@
 import numpy
-import openai
+from openai import OpenAI
 import trafilatura
 from bs4 import BeautifulSoup
 import requests
@@ -7,11 +7,17 @@ import json
 import credentials
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from dotenv import load_dotenv
+# from fastapi import FastAPI
+from pymongo import MongoClient
+import os
+
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0'}
 
-openai.api_key = credentials.openai_api_key
+load_dotenv()
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 
 class ReadRss:
@@ -60,14 +66,14 @@ def get_articles(articles_dicts):
     return articles
 
 def summarise_article(article_text):
-    response = openai.ChatCompletion.create(
+    response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
             {"role": "user", "content": "Please provide a seven sentence summary of the following: " + article_text}
         ]
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 def get_similar_link(article, dicts):
     vectorizer = TfidfVectorizer()
@@ -82,8 +88,18 @@ def get_similar_link(article, dicts):
 bbc_articles = get_articles(bbc.articles_dicts[:7])
 guardian_articles = get_articles(guardian.articles_dicts)
 
-for article in bbc_articles:
-    article['summary'] = summarise_article(article['text'])
-    article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
 
-to_json(bbc_articles, 'data/bbc.json')
+
+
+# to_json(bbc_articles, 'data/bbc.json')
+
+client = MongoClient("mongodb://localhost:5555/")
+db = client["news-summary-db"]
+collection = db["articles-collection"]
+
+for article in bbc_articles:
+    # article['summary'] = summarise_article(article['text'])
+    article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
+    collection.insert_one(article)
+
+
