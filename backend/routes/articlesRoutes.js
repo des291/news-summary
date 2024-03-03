@@ -51,12 +51,26 @@ router.get('/', async (request, response) => {
 });
 
 // route to get article by id
-router.get('/:id', async (request, response) => {
+// router.get('/:id', async (request, response) => {
+//     try {
+
+//         const { id } = request.params;
+
+//         const article = await Article.findById(id);
+//         return response.status(200).json(article);
+//     } catch (error) {
+//         console.log(error.message);
+//         response.status(500).send({ message: error.message });
+//     }
+// });
+
+// route to get article by index
+router.get('/:index', async (request, response) => {
     try {
 
-        const { id } = request.params;
+        const { index } = request.params;
 
-        const article = await Article.findById(id);
+        const article = await Article.find({ index: index });
         return response.status(200).json(article);
     } catch (error) {
         console.log(error.message);
