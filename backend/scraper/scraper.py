@@ -92,14 +92,14 @@ guardian_articles = get_articles(guardian.articles_dicts)
 
 
 # to_json(bbc_articles, 'data/bbc.json')
-
-client = MongoClient("mongodb://localhost:5555/")
-db = client["news-summary-db"]
-collection = db["articles-collection"]
-
 for article in bbc_articles:
-    # article['summary'] = summarise_article(article['text'])
+    article['summary'] = summarise_article(article['text'])
     article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
-    collection.insert_one(article)
 
+client = MongoClient(os.environ.get("ATLAS_URI"))
+db = client["articles-collection"]
+collection = db["articles"]
+
+print(collection.insert_many(bbc_articles))
+print(collection.inserted_ids)
 
