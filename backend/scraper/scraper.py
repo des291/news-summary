@@ -62,6 +62,7 @@ def get_articles(articles_dicts):
         result = trafilatura.extract(downloaded, include_comments=False,
                      include_tables=False, include_links=False)
         article_data['text'] = result
+        article_data['index'] = articles_dicts.index(article)
         articles.append(article_data)
     return articles
 
@@ -98,6 +99,7 @@ for article in bbc_articles:
 
 client = MongoClient(os.environ.get("ATLAS_URI"))
 db = client["articles-collection"]
+db.drop_collection("articles")
 collection = db["articles"]
 
 print(collection.insert_many(bbc_articles))

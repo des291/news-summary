@@ -21,6 +21,10 @@ const articleSchema = mongoose.Schema(
         guardian_link: {
             type: String,
             required: true
+        },
+        index: {
+            type: Number,
+            required: true
         }
     }, {
     timestamps: true,
