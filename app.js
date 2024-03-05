@@ -3,15 +3,25 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const dotenv = require('dotenv').config()
+const schedule = require('node-schedule');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const articleRouter = require('./routes/articles')
-const app = express();
 
+const rule = new schedule.RecurrenceRule();
+rule.hour = [6, 17];
+
+const spawn = require("child_process").spawn;
+const scraper = schedule.scheduleJob(rule, () => {
+  spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
+});
+
+const app = express();
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
-const mongoDB = 'mongodb+srv://desgrainger:xmo7jqu2kE6QkgSF@news-summary-db.biudxha.mongodb.net/articles-collection?retryWrites=true&w=majority&appName=news-summary-db';
+const mongoDB = process.env.MONGODB_URI;
 
 main().catch((err) => console.log(err));
 async function main() {
