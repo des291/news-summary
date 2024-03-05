@@ -1,9 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./.{html,js}"],
-  // content: ["./src/**/*.{html,js}"],
+  // content: ["./.{html,js}"],
+  // content: ["./src/**/*.{html,js,pug}"],
+  content: ["./views/*.{html,js,pug}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'inter': ['inter', 'sans-serif'],
+      }
+    },
   },
   plugins: [],
 }
