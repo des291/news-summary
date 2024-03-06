@@ -8,11 +8,11 @@ block content
     //- div= articles
     each article in articles
       div.container
-        div.headline.text-xl.font-semibold(class='hover:font-bold hover:cursor-pointer')= article.title
-        div.summary.hidden.font-light= article.summary
-        span.hidden Read more:
-        a.link.hidden.m-2(href=article.link, target='_blank') BBC
-        a.guardian_link.hidden(href=article.guardian_link, target='_blank') Guardian
+        h2.headline.text-xl.font-semibold(class='hover:font-bold hover:cursor-pointer')= article.title
+        p.summary.hidden.font-extralight= article.summary
+        span.hidden.font-extralight Read more:
+        a.link.hidden.m-2.font-light(href=article.link, target='_blank') BBC
+        a.guardian_link.hidden.font-light(href=article.guardian_link, target='_blank') Guardian
   div.sticky.top-0.container.mx-auto(id='sport')
       div.bg-stone-900
         h1.text-5xl.italic.text-blue-400 SPORT
