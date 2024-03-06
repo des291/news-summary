@@ -14,9 +14,10 @@ const rule = new schedule.RecurrenceRule();
 rule.hour = [6, 17];
 
 const spawn = require("child_process").spawn;
-const scraper = schedule.scheduleJob(rule, () => {
-  spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
-});
+// const scraper = spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
+// const scraper = schedule.scheduleJob(rule, () => {
+//   spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
+// });
 
 const app = express();
 const mongoose = require('mongoose');

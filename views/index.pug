@@ -4,7 +4,7 @@ block content
   div.container.mx-auto(id='news')
     div.columns-2.sticky.top-0.bg-stone-900
       h1.text-5xl.italic.text-orange-400 NEWS
-      div.text-right(id='clock')
+      h1.text-right.text-5xl.italic.text-orange-400.font-thin= datestamp
     //- div= articles
     each article in articles
       div.container

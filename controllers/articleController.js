@@ -4,8 +4,9 @@ const asyncHandler = require("express-async-handler");
 // Display list of all Articles.
 exports.index = asyncHandler(async (req, res, next) => {
     const articles = await Article.find({}).exec();
+    const datestamp = await Article.distinct('datestamp');
     // res.send(articles)
-    res.render('index', { articles });
+    res.render('index', { articles, datestamp });
 });
 
 // Display detail page for a specific Article.

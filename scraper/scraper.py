@@ -4,12 +4,11 @@ import trafilatura
 from bs4 import BeautifulSoup
 import requests
 import json
-import credentials
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
-# from fastapi import FastAPI
 from pymongo import MongoClient
+import datetime
 import os
 
 
@@ -48,10 +47,6 @@ class ReadRss:
 bbc = ReadRss('https://feeds.bbci.co.uk/news/rss.xml?edition=uk', headers)
 guardian = ReadRss('https://www.theguardian.com/uk/rss', headers)
 
-def to_json(articles, path):
-    with open(path, 'w') as file:
-        json.dump(articles, file)
-
 def get_articles(articles_dicts):
     articles = []
     for article in articles_dicts:
@@ -86,16 +81,24 @@ def get_similar_link(article, dicts):
     max_index = similarity.argmax()
     return dicts[max_index]['link']
 
+def get_datestamp():
+    now = datetime.datetime.now()
+    month = now.month
+    day = now.day
+    if now.hour >= 12:
+        time = 'PM'
+    else:
+        time = 'AM'
+    return f"{day}/{month} {time}"
+
 bbc_articles = get_articles(bbc.articles_dicts[:7])
 guardian_articles = get_articles(guardian.articles_dicts)
+datestamp = get_datestamp()
 
-
-
-
-# to_json(bbc_articles, 'data/bbc.json')
 for article in bbc_articles:
     article['summary'] = summarise_article(article['text'])
     article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
+    article['datestamp'] = datestamp
 
 client = MongoClient(os.environ.get("ATLAS_URI"))
 db = client["articles-collection"]

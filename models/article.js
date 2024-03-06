@@ -27,6 +27,10 @@ const ArticleSchema = new Schema(
         index: {
             type: Number,
             required: true
+        },
+        datestamp: {
+            type: String,
+            required: true
         }
     }, {
     timestamps: true,

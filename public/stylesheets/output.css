@@ -618,7 +618,7 @@ video {
 }
 
 .font-inter {
-  font-family: inter, sans-serif;
+  font-family: Inter, sans-serif;
 }
 
 .text-5xl {
@@ -637,6 +637,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-thin {
+  font-weight: 100;
 }
 
 .italic {
