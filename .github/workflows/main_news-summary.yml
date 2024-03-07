@@ -37,10 +37,12 @@ jobs:
           path: release.zip
 
       - name: Set up Python
-      - uses: actions/setup-python@v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10' 
-      - run: python pip install -r scraper/requirements.txt
+
+      - name: pip install requirements
+        run: python pip install -r scraper/requirements.txt
 
   deploy:
     runs-on: ubuntu-latest
