@@ -24,10 +24,6 @@ const ArticleSchema = new Schema(
             type: String,
             required: true
         },
-        index: {
-            type: Number,
-            required: true
-        },
         datestamp: {
             type: String,
             required: true

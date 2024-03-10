@@ -5,20 +5,21 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const dotenv = require('dotenv').config()
 const schedule = require('node-schedule');
+const spawn = require("child_process").spawn;
 const helmet = require('helmet');
+const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
 
+// Schedule scraper.py to run at 06:00 and 17:00
 const rule = new schedule.RecurrenceRule();
 rule.hour = [6, 17];
-
-const spawn = require("child_process").spawn;
 const scraper = schedule.scheduleJob(rule, () => {
   spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
 });
 
 const app = express();
-const mongoose = require('mongoose');
+
 mongoose.set('strictQuery', false);
 const mongoDB = process.env.MONGODB_URI;
 
@@ -32,10 +33,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
+
+// needed to read body of response
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
+// links css/images/javascript
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(cookieParser());
 app.use(helmet());
 
 app.use('/', indexRouter);

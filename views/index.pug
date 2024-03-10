@@ -1,19 +1,18 @@
 extends layout
 
 block content
-  div.container.mx-auto(id='news')
-    div.columns-2.sticky.top-0.bg-stone-900
-      h1.text-5xl.italic.text-orange-400 NEWS
-      h1.text-right.text-5xl.italic.text-orange-400.font-thin= datestamp
-    //- div= articles
+  div(class='container mx-auto' id='news')
+    div(class='columns-2 sticky top-0 bg-stone-900')
+      h1(class='text-5xl italic text-orange-400') NEWS
+      h1(class='text-right text-5xl italic text-orange-400 font-thin')= datestamp
     each article in articles
-      div.container
-        h2.headline.text-xl.font-semibold(class='hover:font-bold hover:cursor-pointer')= article.title
-        p.summary.hidden.font-extralight= article.summary
-        span.hidden.font-extralight Read more:
-        a.link.hidden.m-2.font-light(href=article.link, target='_blank') BBC
-        a.guardian_link.hidden.font-light(href=article.guardian_link, target='_blank') Guardian
-  div.sticky.top-0.container.mx-auto(id='sport')
-      div.bg-stone-900
-        h1.text-5xl.italic.text-blue-400 SPORT
+      div(class='container')
+        h2(class='headline text-xl font-semibold hover:font-bold hover:cursor-pointer')= article.title
+        p(class='summary hidden font-extralight')= article.summary
+        span(class='hidden font-extralight') Read more:
+        a(class='link hidden m-2 font-light' href=article.link, target='_blank') BBC
+        a(class='guardian_link hidden font-light' href=article.guardian_link, target='_blank') Guardian
+  div(class='sticky top-0 container mx-auto' id='sport')
+      div(class='bg-stone-900')
+        h1(class='text-5xl italic text-blue-400') SPORT
   script(src="/javascripts/main.js")

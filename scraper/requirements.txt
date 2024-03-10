@@ -17,7 +17,6 @@ courlan==1.0.0
 cymem==2.0.8
 dateparser==1.1.8
 distlib==0.3.8
-en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl#sha256=ab70aeb6172cde82508f7739f35ebc9918a3d07debeed637403c8f794ba3d3dc
 filelock==3.13.1
 Flask==2.3.2
 frozenlist==1.4.0

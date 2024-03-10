@@ -3,7 +3,6 @@ from openai import OpenAI
 import trafilatura
 from bs4 import BeautifulSoup
 import requests
-import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
@@ -15,14 +14,23 @@ import os
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0'}
 
+
+# get OpenAI and MongoDB details from .env
 load_dotenv()
+
 openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 
 class ReadRss:
-
+    """This class is used to create an object that contains the data from a RSS webpage."""
     def __init__(self, rss_url, headers):
-
+        """
+        Parameters:
+        rss_url: str
+            url for RSS feed
+        headers: dict
+            dict containing 'User-Agent' value so scrape does not get blocked
+        """
         self.url = rss_url
         self.headers = headers
         try:
@@ -48,6 +56,7 @@ bbc = ReadRss('https://feeds.bbci.co.uk/news/rss.xml?edition=uk', headers)
 guardian = ReadRss('https://www.theguardian.com/uk/rss', headers)
 
 def get_articles(articles_dicts):
+    """Extracts the text from each of the links in articles_dicts and returns a list of dicts containig title, link and text values."""
     articles = []
     for article in articles_dicts:
         article_data = {}
@@ -57,11 +66,11 @@ def get_articles(articles_dicts):
         result = trafilatura.extract(downloaded, include_comments=False,
                      include_tables=False, include_links=False)
         article_data['text'] = result
-        article_data['index'] = articles_dicts.index(article)
         articles.append(article_data)
     return articles
 
 def summarise_article(article_text):
+    """Takes the article text and asks ChatGPT to provide a summary. Returns the summary."""
     response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -72,6 +81,7 @@ def summarise_article(article_text):
     return response.choices[0].message.content
 
 def get_similar_link(article, dicts):
+    """Compares the article to each article in the dict and returns the link to the article with the highest cosine similarity."""
     vectorizer = TfidfVectorizer()
     articles = [comp_article['text'] for comp_article in dicts]
     articles.insert(0, article)
@@ -82,6 +92,7 @@ def get_similar_link(article, dicts):
     return dicts[max_index]['link']
 
 def get_datestamp():
+    """Returns the current datetime int he format as per following example: 31/10 PM."""
     now = datetime.datetime.now()
     month = now.month
     day = now.day
@@ -100,11 +111,10 @@ for article in bbc_articles:
     article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
     article['datestamp'] = datestamp
 
+# Set up MongoDB. Remove existing articles then add the new ones.
 client = MongoClient(os.environ.get("ATLAS_URI"))
 db = client["articles-collection"]
 db.drop_collection("articles")
 collection = db["articles"]
-
-print(collection.insert_many(bbc_articles))
-print(collection.inserted_ids)
+collection.insert_many(bbc_articles)
 
