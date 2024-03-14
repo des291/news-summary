@@ -1,5 +1,5 @@
 import numpy
-from openai import OpenAI
+# from openai import OpenAI
 import trafilatura
 from bs4 import BeautifulSoup
 import requests
@@ -10,6 +10,9 @@ from pymongo import MongoClient
 import datetime
 import os
 
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
+
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0'}
@@ -18,8 +21,9 @@ headers = {
 # get OpenAI and MongoDB details from .env
 load_dotenv()
 
-openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
+mistral_client = MistralClient(api_key=os.environ["MISTRAL_API_KEY"])
 
 class ReadRss:
     """This class is used to create an object that contains the data from a RSS webpage."""
@@ -69,15 +73,21 @@ def get_articles(articles_dicts):
         articles.append(article_data)
     return articles
 
-def summarise_article(article_text):
-    """Takes the article text and asks ChatGPT to provide a summary. Returns the summary."""
-    response = openai_client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
-            {"role": "user", "content": "Please provide a seven sentence summary of the following: " + article_text}
-        ]
-    )
+# def summarise_article(article_text):
+#     """Takes the article text and asks ChatGPT to provide a summary. Returns the summary."""
+#     response = openai_client.chat.completions.create(
+#         model="gpt-3.5-turbo",
+#         messages=[
+#             {"role": "system", "content": "You are a helpful summarisation tool that provides seven sentence summaries of text."},
+#             {"role": "user", "content": "Please provide a seven sentence summary of the following: " + article_text}
+#         ]
+#     )
+#     return response.choices[0].message.content
+
+def mistral_summarise_article(article_text):
+    response = mistral_client.chat(
+        model='open-mistral-7b',
+        messages=[ChatMessage(role="system", content="You are a helpful summarisation tool that provides seven sentence summaries of text."), ChatMessage(role="user", content="Please provide a one paragraph summary of the following: " + article_text)])
     return response.choices[0].message.content
 
 def get_similar_link(article, dicts):
@@ -107,7 +117,7 @@ guardian_articles = get_articles(guardian.articles_dicts)
 datestamp = get_datestamp()
 
 for article in bbc_articles:
-    article['summary'] = summarise_article(article['text'])
+    article['summary'] = mistral_summarise_article(article['text'])
     article['guardian_link'] = get_similar_link(article['text'], guardian_articles)
     article['datestamp'] = datestamp
 
