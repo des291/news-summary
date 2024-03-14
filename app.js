@@ -14,6 +14,8 @@ const indexRouter = require('./routes/index');
 // Schedule scraper.py to run at 06:00 and 17:00
 const rule = new schedule.RecurrenceRule();
 rule.hour = [6, 17];
+rule.minute = 0;
+rule.second = 0;
 const scraper = schedule.scheduleJob(rule, () => {
   spawn('scraper/venv/bin/python', ['scraper/scraper.py']);
 });
