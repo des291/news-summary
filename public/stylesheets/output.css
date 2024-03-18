@@ -599,8 +599,16 @@ video {
   display: block;
 }
 
+.inline {
+  display: inline;
+}
+
 .hidden {
   display: none;
+}
+
+.h-4 {
+  height: 1rem;
 }
 
 .columns-2 {

@@ -10,8 +10,10 @@ block content
         h2(class='headline text-xl font-semibold hover:font-bold hover:cursor-pointer')= article.title
         p(class='summary hidden font-extralight')= article.summary
         span(class='hidden font-extralight') Read more:
-        a(class='link hidden m-2 font-light' href=article.link, target='_blank') BBC
-        a(class='guardian_link hidden font-light' href=article.guardian_link, target='_blank') Guardian
+        a(class='link hidden m-2 font-light' href=article.link, target='_blank')
+            img(class='h-4 inline' src='/images/bbc_news.svg')
+        a(class='guardian_link hidden font-light' href=article.guardian_link, target='_blank')
+            img(class='h-4 inline' src='/images/guardian.svg')
   div(class='sticky top-0 container mx-auto' id='sport')
       div(class='bg-stone-900')
         h1(class='text-5xl italic text-blue-400') SPORT
