@@ -7,7 +7,7 @@ block content
       h1(class='text-right text-5xl italic text-orange-400 font-thin')= datestamp
     each article in articles
       div(class='container')
-        h2(class='headline text-xl font-semibold hover:font-bold hover:cursor-pointer')= article.title
+        h2(class='headline text-xl hover:font-medium hover:cursor-pointer')= article.title
         p(class='summary hidden font-extralight')= article.summary
         span(class='hidden font-extralight') Read more:
         a(class='link hidden m-2 font-light' href=article.link, target='_blank')

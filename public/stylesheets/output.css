@@ -647,10 +647,6 @@ video {
   font-weight: 300;
 }
 
-.font-semibold {
-  font-weight: 600;
-}
-
 .font-thin {
   font-weight: 100;
 }
@@ -678,6 +674,6 @@ video {
   cursor: pointer;
 }
 
-.hover\:font-bold:hover {
-  font-weight: 700;
+.hover\:font-medium:hover {
+  font-weight: 500;
 }

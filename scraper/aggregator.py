@@ -56,3 +56,5 @@ now = datetime.datetime.now()
 diff = now - pubdate
 print(diff.seconds/3600)
 print(bbc.articles_dicts)
+datestamp = datetime.datetime.now().strftime('%-d/%-m %p')
+print(datestamp)

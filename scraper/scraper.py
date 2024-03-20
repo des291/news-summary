@@ -89,20 +89,9 @@ def get_similar_link(article, dicts):
     max_index = similarity.argmax()
     return dicts[max_index]['link']
 
-def get_datestamp():
-    """Returns the current datetime int he format as per following example: 31/10 PM."""
-    now = datetime.datetime.now()
-    month = now.month
-    day = now.day
-    if now.hour >= 12:
-        time = 'PM'
-    else:
-        time = 'AM'
-    return f"{day}/{month} {time}"
-
 bbc_articles = get_articles(bbc.articles_dicts[:7])
 guardian_articles = get_articles(guardian.articles_dicts)
-datestamp = get_datestamp()
+datestamp = datetime.datetime.now().strftime('%-d/%-m %p')
 
 for article in bbc_articles:
     article['summary'] = summarise_article(article['text'])
